@@ -32,17 +32,24 @@ def match(ra1,dec1,ra2,dec2):
 ##
 ##############################################
 
-def plot_offset(test, threshold):
+def plot_offset(semester,field, test='plot', threshold='default'):
 
-    hdulist = fits.open('newfirm_mbs_deepz_sdss_catalog.fits')
-    #hdulist2 = fits.open('newfirm_mbs_deepz_sdss_offset.fits')
+    if field == 'cosmos':
+        hdulist = fits.open(semester+'/COSMOS2015_specz_sdss_catalog.fits')
+    else:
+        hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_catalog.fits')
+    #hdulist2 = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_offset.fits')
     nf = hdulist[1].data
     sdss = hdulist[2].data
 
     #Make color cut below science cut to help with astrometric fitting
     #Make galaxy cut in sdss data for astrometric comparison
-    colorcut = nf['R'] > 15.849#This is FLUX!!!! and a mag limit < 22
-    sdsscut = sdss['R'] < 22#THIS IS Magnitude!!!
+    if field == 'cosmos':
+        colorcut = nf.r < 22.0
+        sdsscut = sdss['R'] < 22
+    else:
+        colorcut = nf['R'] > 15.849#This is FLUX!!!! and a mag limit < 22
+        sdsscut = sdss['R'] < 22#THIS IS Magnitude!!!
 
     #Clean ra and dec for astrometric matching
     nf_ra = nf['ra']#[colorcut]
@@ -51,12 +58,12 @@ def plot_offset(test, threshold):
     sdss_ra = sdss['ra']#[sdsscut]
     sdss_dec = sdss['dec']#[sdsscut]
 
-    print len(sdss_dec)
-    print len(nf_dec)
+    print(len(sdss_dec))
+    print(len(nf_dec))
 
     #use the match function to determine the closest objects
     idx, d2d = match(sdss_ra,sdss_dec,nf_ra,nf_dec)
-    print len(idx)
+    print(len(idx))
 
     #print np.median(d2d)
 
@@ -75,10 +82,10 @@ def plot_offset(test, threshold):
     dec_diff = np.empty(len(locations))
 
     for i in range(len(locations)):
-
         ra_diff[i] = nf_ra[locations[i]] - sdss_ra[hitcut][i]
         dec_diff[i] = nf_dec[locations[i]] - sdss_dec[hitcut][i]
-    print len(ra_diff)
+        
+    print(len(ra_diff))
 
     if test == 'plot':
         plt.figure(1)
@@ -92,20 +99,24 @@ def plot_offset(test, threshold):
         return np.median(ra_diff)*3600, np.median(dec_diff)*3600
 
 
-def apply_offset():
+def apply_offset(semester, field, test='plot', threshold='default'):
 
-    hdulist = fits.open('newfirm_mbs_deepz_sdss_catalog.fits')
+    if field == 'cosmos':
+        hdulist = fits.open(semester+'/COSMOS2015_specz_sdss_catalog.fits')
+    else:
+        hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_catalog.fits')
+        
     nf = hdulist[1].data
     sdss = hdulist[2].data
     
-    ra_corr, dec_corr = plot_offset('plot',3)
+    ra_corr, dec_corr = plot_offset(semester,test,threshold)
 
     sdsscut = sdss['type_r'] == 6
 
     sdss_ra = sdss['ra']#[sdsscut]
     sdss_dec = sdss['dec']#[sdsscut]
 
-    print ra_corr, dec_corr
+    print(ra_corr, dec_corr)
 
     new_ra = sdss_ra + (ra_corr/3600)
     new_dec = sdss_dec + (dec_corr/3600)
@@ -113,8 +124,12 @@ def apply_offset():
     ########################################################
     #check the new ra and dec to ensure offset is < 0.001"
     ########################################################
-    colorcut = nf['R'] > 15.849 # This is a flux limit corresponding to a mag limit < 22
-    sdsscut = sdss['R'] < 22
+    if field == 'cosmos':
+        colorcut = nf.r < 22.0
+        sdsscut = sdss['R'] < 22
+    else:
+        colorcut = nf['R'] > 15.849#This is FLUX!!!! and a mag limit < 22
+        sdsscut = sdss['R'] < 22#THIS IS Magnitude!!!
 
     nf_ra = nf['ra'][colorcut]
     nf_dec = nf['dec'][colorcut]
@@ -138,27 +153,33 @@ def apply_offset():
         dec_diff[i] = nf_dec[locations[i]] - clean_dec[hitcut][i]
     
 
-    if (np.median(ra_diff)*3600 < 0.1) & (np.median(dec_diff)*3600 < 0.1):
+    if (np.abs(np.median(ra_diff))*3600 < 0.1) & (np.abs(np.median(dec_diff))*3600 < 0.1):
 
         plt.figure(2)
         n, bins, patches = plt.hist(ra_diff, 30, histtype = 'step', color = 'b')
         n, bins, patches = plt.hist(dec_diff, 30, histtype = 'step', color  = 'g')
         plt.show()
 
-        nfcut = nf['K'] > 6.309
+        if field == 'cosmos':
+            nfcut = nf['Ks'] > 6.309
+        else:
+            nfcut = nf['K'] > 6.309
         new_nf = nf[nfcut]
         hdulist[1].data = new_nf
         
         sdss['ra'] = new_ra
         sdss['dec'] = new_dec
 
-        hdulist.writeto('newfirm_mbs_deepz_sdss_offset.fits')
+        if field == 'cosmos':
+            hdulist.writeto(semester+'/COSMOS2015_specz_sdss_offset.fits')
+        else:
+            hdulist.writeto(semester+'/newfirm_mbs_specz_sdss_offset.fits')
 
-        print np.median(ra_diff)*3600, np.median(dec_diff)*3600
+        print(np.median(ra_diff)*3600, np.median(dec_diff)*3600)
 
     else:
 
-        print 'Check routine, offset sucks!!!'
+        print('Check routine, offset sucks!!!')
 
     
 

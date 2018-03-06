@@ -16,11 +16,11 @@ cosmo = FlatLambdaCDM(H0=70,Om0=0.3)
 
 def input1(maskname, semester, maskPA, masknum):
 
-    hdulist = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass1.fits')
+    hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
     targetdata = hdulist[1].data
     stardata = hdulist[2].data
 
-    data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_specz_sdss_priority_mask5.fits')[1].data
     targetINFO = data_updateinfo['target']
 
     print(len(targetINFO[np.where(targetINFO==1)]))
@@ -103,7 +103,11 @@ def input1(maskname, semester, maskPA, masknum):
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) ^ (targetPcode == 100)
+    if masknum == 82:
+        pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1))
+    else:
+        pflagcut = ((targetPcode == 10000) & (targetINFO != 1))
+        
     print(targetINFO[pflagcut])
     print(targetID[pflagcut])
 
@@ -129,7 +133,8 @@ def input1(maskname, semester, maskPA, masknum):
     elif masknum == 23:
         objPA[:] = -7
     else:
-        print('PA sucks...')
+        objPA[:] = maskPA+5.0
+        #print('PA sucks...')
 
     finalID = np.append(finalID, tID)
     finalRA = np.append(finalRA, tRA)
@@ -255,23 +260,25 @@ def input1(maskname, semester, maskPA, masknum):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017a': 'deimos mask'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
-    t.write(maskname+'.input', format='ascii',overwrite=True)
+    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii',overwrite=True)
 
 ############################################################################################################################
 ############################################################################################################################
 ############################################################################################################################
 ############################################################################################################################
 
-def input2(maskname, maskPA, masknum):
+def input2(maskname, semester, maskPA, masknum):
 
-    hdulist = fits.open('newfirm_mbs_deepz_sdss_priority_pass1.fits')
+    hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
     targetdata = hdulist[1].data
     stardata = hdulist[2].data
 
-    data_updateinfo = fits.open('newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_specz_sdss_priority_mask5.fits')[1].data
     targetINFO = data_updateinfo['target']
+
+    print(len(targetINFO[np.where(targetINFO==1)]))
 
     if masknum == 11:
         hdum = fits.open('masks_round2/mask11a.fits')
@@ -279,6 +286,8 @@ def input2(maskname, maskPA, masknum):
         hdum = fits.open('masks_round2/mask21a.fits')
     elif masknum == 31:
         hdum = fits.open('masks_round2/mask31a.fits')
+    elif masknum == 82:
+        hdum = fits.open(semester+'/maskdesign/m17B82a.fits')
     else:
         print('wrong...try again!')
 
@@ -363,7 +372,12 @@ def input2(maskname, maskPA, masknum):
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) ^ ((targetPcode == 100) & (targetINFO != 1) ) ^ ((targetPcode == 1000) & (targetINFO != 1)) ^ ((targetPcode == 10) & (targetINFO != 1))
+    if masknum == 82:
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1)) | ((targetPcode == 5000) & (targetINFO != 1)) | ((targetPcode == 50) & (targetINFO != 1)))
+        
+    else:
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) | ((targetPcode == 5000) & (targetINFO != 1)))
+    
     print(targetINFO[pflagcut])
     print(np.max(targetINFO[pflagcut]))
     print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
@@ -384,7 +398,8 @@ def input2(maskname, maskPA, masknum):
     elif masknum == 21:
         objPA[:] = -7
     else:
-        print('PA sucks...')
+        objPA[:] = maskPA + 5.0
+        #print('PA sucks...')
 
     finalID = np.append(finalID, tID)
     finalRA = np.append(finalRA, tRA)
@@ -518,22 +533,22 @@ def input2(maskname, maskPA, masknum):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2016a': 'deimos mask'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
-    t.write('masks_round2/'+maskname+'.input', format='ascii')
+    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii',overwrite=True)
 
 ############################################################################################################################
 ############################################################################################################################
 ############################################################################################################################
 ############################################################################################################################
 
-def input3(maskname, maskPA, masknum):
+def input3(maskname, semester, maskPA, masknum):
 
-    hdulist = fits.open('newfirm_mbs_deepz_sdss_priority_pass1.fits')
+    hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
     targetdata = hdulist[1].data
     stardata = hdulist[2].data
 
-    data_updateinfo = fits.open('newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_specz_sdss_priority_mask5.fits')[1].data
     targetINFO = data_updateinfo['target']
 
     if masknum == 11:
@@ -542,6 +557,8 @@ def input3(maskname, maskPA, masknum):
         hdum = fits.open('masks_round2/mask21b.fits')
     elif masknum == 31:
         hdum = fits.open('masks_round2/mask31b.fits')
+    elif masknum == 82:
+        hdum = fits.open(semester+'/maskdesign/m17B82b.fits')
     else:
         print('wrong...try again!')
 
@@ -627,7 +644,12 @@ def input3(maskname, maskPA, masknum):
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) ^ (targetPcode == 100) ^ ((targetPcode == 1000) & (targetINFO != 1)) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & ((targetMAG < 24.) & (targetMAG > 18.)) & ((targetZ > 1.3) ^ (targetZ < 0.3))) ^ ((targetPcode == 1) & (targetMAG > 25.5) & (targetZ < 1.3) & (targetZ > 0.3))
+    if masknum == 82:
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1)) | ((targetPcode == 5000) & (targetINFO != 1)) | ((targetPcode == 50) & (targetINFO != 1))) | ((targetPcode == 1000) & (targetINFO != 1)) | ((targetPcode == 10) & (targetINFO != 1)) | ((targetPcode == 5) & (targetINFO != 1)) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.2) & (targetINFO != 1) & (targetMAG < 26.0))
+        
+    else:
+        pflagcut = (targetPcode >= 5) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) | ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & ((targetZ > 1.3) | (targetZ < 0.3)))
+        
     print(targetINFO[pflagcut])
     print(np.max(targetINFO[pflagcut]))
     print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
@@ -648,7 +670,8 @@ def input3(maskname, maskPA, masknum):
     elif masknum == 21:
         objPA[:] = -7
     else:
-        print('PA sucks...')
+        objPA[:] = maskPA + 5.0
+        #print('PA sucks...')
     
 
     finalID = np.append(finalID, tID)
@@ -782,6 +805,6 @@ def input3(maskname, maskPA, masknum):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2016a': 'deimos mask'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
-    t.write('masks_round2/'+maskname+'.input', format='ascii')
+    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii', overwrite=True)

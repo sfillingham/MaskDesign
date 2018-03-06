@@ -5,7 +5,6 @@ from astropy.table import Table
 from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
 cosmo = FlatLambdaCDM(H0=70,Om0=0.3)
-import pdb
 
 ###########################################################################
 ##
@@ -15,60 +14,16 @@ import pdb
 ##
 ############################################################################
 
-def input1(maskname,semester,maskPA=0,masknum=1):
+def input1(maskname, semester, maskPA, masknum):
 
-    if semester == '2017B':
-        hdulist = fits.open(semester+'/COSMOS2015_specz_sdss_priority.fits')
-    elif semester == '2018A':
-        hdulist = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority.fits')
-    else:
-        hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
+    hdulist = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority.fits')
     targetdata = hdulist[1].data
-    targetINFO = targetdata['target']
     stardata = hdulist[2].data
 
-    if masknum == 30:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
-        targetINFO = data_updateinfo['target']
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority_mask3.fits')[1].data
+    targetINFO = data_updateinfo['target']
 
-        print((len(targetINFO[np.where(targetINFO==1)])))
-
-    elif masknum == 40:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print((len(targetINFO[np.where(targetINFO==1)])))
-
-    elif masknum == 13:
-        hdu_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')
-        data_updateinfo = hdu_updateinfo[1].data
-        targetINFO = data_updateinfo['target']
-        
-        print((len(targetINFO[np.where(targetINFO==1)[0]])))
-
-    elif masknum == 14:
-        hdu_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')
-        data_updateinfo = hdu_updateinfo[1].data
-        targetINFO = data_updateinfo['target']
-        
-        print((len(targetINFO[np.where(targetINFO==1)[0]])))
-
-    elif masknum == 22:
-        hdu_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')
-        data_updateinfo = hdu_updateinfo[1].data
-        targetINFO = data_updateinfo['target']
-        
-        print((len(targetINFO[np.where(targetINFO==1)[0]])))
-
-    elif masknum == 32:
-        hdu_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')
-        data_updateinfo = hdu_updateinfo[1].data
-        targetINFO = data_updateinfo['target']
-        
-        print((len(targetINFO[np.where(targetINFO==1)[0]])))
-        
-    else:
-        print('all objects are being targeted first time')
+    print(len(targetINFO[np.where(targetINFO==1)]))
 
     #############################
     ## Read in all necessary data
@@ -85,8 +40,8 @@ def input1(maskname,semester,maskPA=0,masknum=1):
             targetMAG[i] = -2.5*np.log10(targetFLUX[i]) + 25.0
             
     targetPcode = targetdata['Pflag']
-    #targetELLIP = targetdata['K_ellip']
-    #targetPA = targetdata['K_theta_J2000']
+    targetELLIP = targetdata['K_ellip']
+    targetPA = targetdata['K_theta_J2000']
     
     starID = stardata['sID']
     starRA = stardata['ra']
@@ -94,31 +49,33 @@ def input1(maskname,semester,maskPA=0,masknum=1):
     starMAG = stardata['r']
     starPflag = stardata['Pflag']
 
-    if masknum == 30:
-        starPflag[np.where(starID == 's15542')[0]] = -2
-        print((starPflag[np.where(starID == 's15542')[0]]))
-        starPflag[np.where(starID == 's17368')[0]] = -2
-        print((starPflag[np.where(starID == 's17368')[0]]))
-        starPflag[np.where(starID == 's16768')[0]] = -2
-        print((starPflag[np.where(starID == 's16768')[0]]))
-        starPflag[np.where(starID == 's11555')[0]] = -2
-        print((starPflag[np.where(starID == 's11555')[0]]))
-
-    elif masknum == 14:
-        starPflag[np.where(starID == 's13030')[0]] = -1
-        print((starPflag[np.where(starID == 's13030')[0]]))
+    if masknum == 21:
+        starPflag[np.where(starID == 's15096')[0]] = -2
+        print(starPflag[np.where(starID == 's15096')[0]])
 
     else:
+        starPflag[np.where(starID == 's15096')[0]] = -1
+        print(starPflag[np.where(starID == 's15096')[0]])
+
+    if masknum == 31:
+        starPflag[np.where(starID == 's15542')[0]] = -2
+        print(starPflag[np.where(starID == 's15542')[0]])
+        starPflag[np.where(starID == 's17368')[0]] = -2
+        print(starPflag[np.where(starID == 's17368')[0]])
+        starPflag[np.where(starID == 's16768')[0]] = -2
+        print(starPflag[np.where(starID == 's16768')[0]])
+        starPflag[np.where(starID == 's11555')[0]] = -2
+        print(starPflag[np.where(starID == 's11555')[0]])
+        
+    else:
         starPflag[np.where(starID == 's15542')[0]] = -1
-        print((starPflag[np.where(starID == 's15542')[0]]))
+        print(starPflag[np.where(starID == 's15542')[0]])
         starPflag[np.where(starID == 's17368')[0]] = -1
-        print((starPflag[np.where(starID == 's17368')[0]]))
+        print(starPflag[np.where(starID == 's17368')[0]])
         starPflag[np.where(starID == 's16768')[0]] = -1
-        print((starPflag[np.where(starID == 's16768')[0]]))
+        print(starPflag[np.where(starID == 's16768')[0]])
         starPflag[np.where(starID == 's11555')[0]] = -1
-        print((starPflag[np.where(starID == 's11555')[0]]))
-        starPflag[np.where(starID == 's13030')[0]] = -2
-        print((starPflag[np.where(starID == 's13030')[0]]))
+        print(starPflag[np.where(starID == 's11555')[0]])
 
     ###############################
     ## Define and fill final arrays
@@ -139,69 +96,16 @@ def input1(maskname,semester,maskPA=0,masknum=1):
     finalSEL = np.empty(len(finalID), dtype = int)
     finalSEL[:] = 0
 
-
+    
     ##################################
     ## Begin with the target selection
     ##################################
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    if masknum == 30:
-        pflagcut = ((targetPcode > 5000) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 40:
-        pflagcut = ((targetPcode > 5000) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 13:
-        pflagcut = ((targetPcode > 5000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 14:
-        pflagcut = (((targetPcode > 5000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1)))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 15:
-        pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 22:
-        pflagcut = ((targetPcode > 5000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 23:
-        pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 32:
-        pflagcut = ((targetPcode > 5000) & (targetINFO != 1)) | ((targetPcode == 100) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
+    if masknum == 80:
+        pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) | (targetPcode == 100)
+        
     elif masknum == 33:
         pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)))
 
@@ -210,38 +114,35 @@ def input1(maskname,semester,maskPA=0,masknum=1):
         print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
         
     else:
-        pflagcut = ((targetPcode == 10000)) #| (targetPcode == 100))
+        pflagcut = ((targetPcode == 10000) & (targetINFO != 1))
+        
+    print(targetINFO[pflagcut])
+    print(targetID[pflagcut])
 
     tID = targetID[pflagcut]
     tRA = targetRA[pflagcut]
     tDEC = targetDEC[pflagcut]
     tMAG = targetMAG[pflagcut]
     tPcode = targetPcode[pflagcut]
-    #tELLIP = targetELLIP[pflagcut]
-    #tPA = targetPA[pflagcut]
+    tELLIP = targetELLIP[pflagcut]
+    tPA = targetPA[pflagcut]
 
-    objPA = np.empty(len(tMAG),dtype = '<f8')
-    if masknum == 30:
+    objPA = np.empty(len(tPA),dtype = '<f8')
+    if masknum == 31:
         objPA[:] = 40.0
-    elif masknum == 10:
+    elif masknum == 11:
         objPA[:] = -78.5
-    elif masknum == 20:
-        objPA[:] = 2.5
-    elif masknum == 22:
-        objPA[:] = maskPA+5.0
-    elif masknum == 40:
-        objPA[:] = -3
     elif masknum == 13:
         objPA[:] = -78.5
-    elif masknum == 12:
-        objPA[:] = -78.5
-    elif masknum == 14:
-        objPA[:] = maskPA-5.0
-    elif masknum == 32:
-        objPA[:] = maskPA-5.0
+    elif masknum == 21:
+        objPA[:] = -7
+    elif masknum == 22:
+        objPA[:] = -7
+    elif masknum == 23:
+        objPA[:] = -7
     else:
         objPA[:] = maskPA+5.0
-        #print('wrong PA...')
+        #print('PA sucks...')
 
     finalID = np.append(finalID, tID)
     finalRA = np.append(finalRA, tRA)
@@ -251,8 +152,6 @@ def input1(maskname,semester,maskPA=0,masknum=1):
     finalPA = np.append(finalPA, objPA)
 
     print('done with targets')
-
-    print(finalID)
 
     
     ##################################################
@@ -269,6 +168,7 @@ def input1(maskname,semester,maskPA=0,masknum=1):
     alignPcode = starPflag[aligncut]
     alignPA = np.empty(len(alignID))
     alignPA[:]=0
+    
 
     finalID = np.append(finalID,alignID)
     finalRA = np.append(finalRA,alignRA)
@@ -350,19 +250,16 @@ def input1(maskname,semester,maskPA=0,masknum=1):
     finalSEL = np.empty(len(finalID), dtype = int)
     finalSEL[:] = 0
 
-    print((len(finalSEL[np.where(finalSEL == 1)[0]])))
-    print((finalID[np.where(finalSEL == 1)[0]]))
-
-    print((len(finalID)))
-    print((len(finalRA)))
-    print((len(finalDEC)))
-    print((len(finalEQ)))
-    print((len(finalMAG)))
-    print((len(finalPBand)))
-    print((len(finalPcode)))
-    print((len(finalSAM)))
-    print((len(finalSEL)))
-    print((len(finalPA)))
+    print(len(finalID))
+    print(len(finalRA))
+    print(len(finalDEC))
+    print(len(finalEQ))
+    print(len(finalMAG))
+    print(len(finalPBand))
+    print(len(finalPcode))
+    print(len(finalSAM))
+    print(len(finalSEL))
+    print(len(finalPA))
     
 
     ##############################################################
@@ -371,10 +268,10 @@ def input1(maskname,semester,maskPA=0,masknum=1):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2018A': 'Keck/DEIMOS mask'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
-    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii', overwrite=True)
-    
+    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii',overwrite=True)
+
 ############################################################################################################################
 ############################################################################################################################
 ############################################################################################################################
@@ -382,39 +279,23 @@ def input1(maskname,semester,maskPA=0,masknum=1):
 
 def input2(maskname, semester, maskPA, masknum):
 
-    if semester == '2018A':
-        hdulist = fits.open('2018A/newfirm_mbs_deepz_sdss_priority.fits')
-    else:
-        hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
-        
+    hdulist = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority.fits')
     targetdata = hdulist[1].data
-    targetINFO = targetdata['target']
     stardata = hdulist[2].data
 
-    if masknum == 10:
-        hdum = fits.open('masks_round2/mask10a.fits')
-    elif masknum == 12:
-        hdum = fits.open('maskdesign/'+semester+'/m12a.fits')
-    elif masknum == 13:
-        hdum = fits.open('maskdesign/'+semester+'/m13a.fits')
-    elif masknum == 14:
-        hdum = fits.open('maskdesign/'+semester+'/m14a.fits')
-    elif masknum == 20:
-        hdum = fits.open('masks_round2/mask20a.fits')
-    elif masknum == 22:
-        hdum = fits.open('maskdesign/'+semester+'/m22a.fits')
-    elif masknum == 30:
-        hdum = fits.open('masks_round2/mask30a.fits')
-    elif masknum == 32:
-        hdum = fits.open('maskdesign/'+semester+'/m32a.fits')
-    elif masknum == 40:
-        hdum = fits.open('masks_round2/mask40a.fits')
-    elif masknum == 70:
-        hdum = fits.open(semester+'/maskdesign/m17B70a.fits')
-    elif masknum == 15:
-        hdum = fits.open(semester+'/maskdesign/m18A15a.fits')
-    elif masknum == 23:
-        hdum = fits.open(semester+'/maskdesign/m18A23a.fits')
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority_mask3.fits')[1].data
+    targetINFO = data_updateinfo['target']
+
+    print(len(targetINFO[np.where(targetINFO==1)]))
+
+    if masknum == 11:
+        hdum = fits.open('masks_round2/mask11a.fits')
+    elif masknum == 21:
+        hdum = fits.open('masks_round2/mask21a.fits')
+    elif masknum == 31:
+        hdum = fits.open('masks_round2/mask31a.fits')
+    elif masknum == 80:
+        hdum = fits.open(semester+'/maskdesign/m17B80a.fits')
     elif masknum == 33:
         hdum = fits.open(semester+'/maskdesign/m18A33a.fits')
     else:
@@ -422,45 +303,6 @@ def input2(maskname, semester, maskPA, masknum):
 
     mdata = hdum[1].data
     mID = mdata['OBJECT']
-
-    if masknum == 30:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 40:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 13:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 14:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 22:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 32:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-        
-    else:
-        print('all objects are being targeted first time')
 
     #############################
     ## Read in all necessary data
@@ -486,7 +328,15 @@ def input2(maskname, semester, maskPA, masknum):
     starMAG = stardata['r']
     starPflag = stardata['Pflag']
 
-    if masknum == 30:
+    if masknum == 21:
+        starPflag[np.where(starID == 's15096')[0]] = -2
+        print(starPflag[np.where(starID == 's15096')[0]])
+
+    else:
+        starPflag[np.where(starID == 's15096')[0]] = -1
+        print(starPflag[np.where(starID == 's15096')[0]])
+
+    if masknum == 31:
         starPflag[np.where(starID == 's15542')[0]] = -2
         print(starPflag[np.where(starID == 's15542')[0]])
         starPflag[np.where(starID == 's17368')[0]] = -2
@@ -495,22 +345,16 @@ def input2(maskname, semester, maskPA, masknum):
         print(starPflag[np.where(starID == 's16768')[0]])
         starPflag[np.where(starID == 's11555')[0]] = -2
         print(starPflag[np.where(starID == 's11555')[0]])
-
-    elif masknum == 14:
-        starPflag[np.where(starID == 's13030')[0]] = -1
-        print((starPflag[np.where(starID == 's13030')[0]]))
-
+        
     else:
         starPflag[np.where(starID == 's15542')[0]] = -1
-        print((starPflag[np.where(starID == 's15542')[0]]))
+        print(starPflag[np.where(starID == 's15542')[0]])
         starPflag[np.where(starID == 's17368')[0]] = -1
-        print((starPflag[np.where(starID == 's17368')[0]]))
+        print(starPflag[np.where(starID == 's17368')[0]])
         starPflag[np.where(starID == 's16768')[0]] = -1
-        print((starPflag[np.where(starID == 's16768')[0]]))
+        print(starPflag[np.where(starID == 's16768')[0]])
         starPflag[np.where(starID == 's11555')[0]] = -1
-        print((starPflag[np.where(starID == 's11555')[0]]))
-        starPflag[np.where(starID == 's13030')[0]] = -2
-        print((starPflag[np.where(starID == 's13030')[0]]))
+        print(starPflag[np.where(starID == 's11555')[0]])
 
     ###############################
     ## Define and fill final arrays
@@ -538,73 +382,8 @@ def input2(maskname, semester, maskPA, masknum):
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    if masknum == 30:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 40:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    #if masknum == 12:
-        #pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        #print(targetINFO[pflagcut])
-        #print(np.max(targetINFO[pflagcut]))
-        #print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 13:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 14:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 22:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 32:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) | (targetPcode == 100)
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 70:
-        pflagcut = ((targetPcode == 10000) | (targetPcode == 5000))
-
-    elif masknum == 23:
-        pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)) | ((targetPcode == 100)) | ((targetPcode == 50)))
-
-        print((targetINFO[pflagcut]))
-        print(targetPcode[pflagcut])
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 15:
-        pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)) | ((targetPcode == 100)) | ((targetPcode == 50)))
-
-        print((targetINFO[pflagcut]))
-        print(targetPcode[pflagcut])
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
+    if masknum == 80:
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) ^ ((targetPcode == 100) & (targetINFO != 1)) ^ ((targetPcode == 5000) & (targetINFO != 1)) ^ ((targetPcode == 50) & (targetINFO != 1)))
 
     elif masknum == 33:
         pflagcut = (((targetPcode == 10000)) | ((targetPcode == 5000)) | ((targetPcode == 100)) | ((targetPcode == 50)))
@@ -615,7 +394,11 @@ def input2(maskname, semester, maskPA, masknum):
         print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
         
     else:
-        pflagcut = targetPcode > 50
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) ^ ((targetPcode == 5000) & (targetINFO != 1)))
+    
+    print(targetINFO[pflagcut])
+    print(np.max(targetINFO[pflagcut]))
+    print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
 
     tID = targetID[pflagcut]
     tRA = targetRA[pflagcut]
@@ -626,38 +409,15 @@ def input2(maskname, semester, maskPA, masknum):
     tPA = targetPA[pflagcut]
 
     objPA = np.empty(len(tPA),dtype = '<f8')
-    if masknum == 30:
+    if masknum == 31:
         objPA[:] = 40.0
-
-    elif masknum == 10:
+    elif masknum == 11:
         objPA[:] = -78.5
-
-    elif masknum == 12:
-        objPA[:] = -78.5
-
-    elif masknum == 13:
-        objPA[:] = -78.5
-
-    elif masknum == 14:
-        objPA[:] = maskPA-5.0
-
-    elif masknum == 20:
-        objPA[:] = 2.5
-
-    elif masknum == 22:
-        objPA[:] = maskPA+5.0
-
-    elif masknum == 32:
-        objPA[:] = maskPA-5.0
-
-    elif masknum == 33:
-        objPA[:] = maskPA-5.0
-        
-    elif masknum == 40:
-        objPA[:] = -3
+    elif masknum == 21:
+        objPA[:] = -7
     else:
-        objPA[:] = maskPA+5.0
-        #print('wrong PA...')
+        objPA[:] = maskPA + 5.0
+        #print('PA sucks...')
 
     finalID = np.append(finalID, tID)
     finalRA = np.append(finalRA, tRA)
@@ -667,6 +427,7 @@ def input2(maskname, semester, maskPA, masknum):
     finalPA = np.append(finalPA, objPA)
 
     print('done with targets')
+
     
     ##################################################
     ## Move to guide and alignment star selection
@@ -768,6 +529,7 @@ def input2(maskname, semester, maskPA, masknum):
         cut = finalID == mID[i]
         finalSEL[cut] = 1
 
+    print('finalSEL')
     print(len(finalSEL[np.where(finalSEL == 1)[0]]))
     print(finalID[np.where(finalSEL == 1)[0]])
 
@@ -778,7 +540,6 @@ def input2(maskname, semester, maskPA, masknum):
     print(len(finalMAG))
     print(len(finalPBand))
     print(len(finalPcode))
-    print(np.unique(finalPcode))
     print(len(finalSAM))
     print(len(finalSEL))
     print(len(finalPA))
@@ -790,10 +551,9 @@ def input2(maskname, semester, maskPA, masknum):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2018A': 'Keck/DEIMOS'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
     t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii',overwrite=True)
-
 
 ############################################################################################################################
 ############################################################################################################################
@@ -802,39 +562,21 @@ def input2(maskname, semester, maskPA, masknum):
 
 def input3(maskname, semester, maskPA, masknum):
 
-    if semester == '2018A':
-        hdulist = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority.fits')
-    else:
-        hdulist = fits.open(semester+'/newfirm_mbs_specz_sdss_priority.fits')
-        
+    hdulist = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority.fits')
     targetdata = hdulist[1].data
-    targetINFO = targetdata['target']
     stardata = hdulist[2].data
 
-    if masknum == 10:
-        hdum = fits.open('masks_round2/mask10b.fits')
-    elif masknum == 12:
-        hdum = fits.open('maskdesign/'+semester+'/m12b.fits')
-    elif masknum == 13:
-        hdum = fits.open('maskdesign/'+semester+'/m13b.fits')
-    elif masknum == 14:
-        hdum = fits.open('maskdesign/'+semester+'/m14b.fits')
-    elif masknum == 20:
-        hdum = fits.open('masks_round2/mask20b.fits')
-    elif masknum == 22:
-        hdum = fits.open('maskdesign/'+semester+'/m22b.fits')
-    elif masknum == 30:
-        hdum = fits.open('masks_round2/mask30b.fits')
-    elif masknum == 32:
-        hdum = fits.open('maskdesign/'+semester+'/m32b.fits')
-    elif masknum == 40:
-        hdum = fits.open('masks_round2/mask40b.fits')
-    elif masknum == 70:
-        hdum = fits.open(semester+'/maskdesign/m17B70b.fits')
-    elif masknum == 15:
-        hdum = fits.open(semester+'/maskdesign/m18A15b.fits')
-    elif masknum == 23:
-        hdum = fits.open(semester+'/maskdesign/m18A23b.fits')
+    data_updateinfo = fits.open(semester+'/newfirm_mbs_deepz_sdss_priority_mask3.fits')[1].data
+    targetINFO = data_updateinfo['target']
+
+    if masknum == 11:
+        hdum = fits.open('masks_round2/mask11b.fits')
+    elif masknum == 21:
+        hdum = fits.open('masks_round2/mask21b.fits')
+    elif masknum == 31:
+        hdum = fits.open('masks_round2/mask31b.fits')
+    elif masknum == 80:
+        hdum = fits.open(semester+'/maskdesign/m17B80b.fits')
     elif masknum == 33:
         hdum = fits.open(semester+'/maskdesign/m18A33b.fits')
     else:
@@ -842,45 +584,6 @@ def input3(maskname, semester, maskPA, masknum):
 
     mdata = hdum[1].data
     mID = mdata['OBJECT']
-
-    if masknum == 30:
-        data_updateinfo = fits.open('newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 40:
-        data_updateinfo = fits.open('newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 13:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 14:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 22:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass2.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    elif masknum == 32:
-        data_updateinfo = fits.open('maskdesign/'+semester+'/newfirm_mbs_deepz_sdss_priority_pass3.fits')[1].data
-        targetINFO = data_updateinfo['target']
-
-        print(len(targetINFO[np.where(targetINFO==1)]))
-
-    else:
-        print('all objects are being targeted first time')
 
     #############################
     ## Read in all necessary data
@@ -907,7 +610,15 @@ def input3(maskname, semester, maskPA, masknum):
     starMAG = stardata['r']
     starPflag = stardata['Pflag']
 
-    if masknum == 30:
+    if masknum == 21:
+        starPflag[np.where(starID == 's15096')[0]] = -2
+        print(starPflag[np.where(starID == 's15096')[0]])
+
+    else:
+        starPflag[np.where(starID == 's15096')[0]] = -1
+        print(starPflag[np.where(starID == 's15096')[0]])
+
+    if masknum == 31:
         starPflag[np.where(starID == 's15542')[0]] = -2
         print(starPflag[np.where(starID == 's15542')[0]])
         starPflag[np.where(starID == 's17368')[0]] = -2
@@ -916,22 +627,16 @@ def input3(maskname, semester, maskPA, masknum):
         print(starPflag[np.where(starID == 's16768')[0]])
         starPflag[np.where(starID == 's11555')[0]] = -2
         print(starPflag[np.where(starID == 's11555')[0]])
-
-    elif masknum == 14:
-        starPflag[np.where(starID == 's13030')[0]] = -1
-        print((starPflag[np.where(starID == 's13030')[0]]))
-
+        
     else:
         starPflag[np.where(starID == 's15542')[0]] = -1
-        print((starPflag[np.where(starID == 's15542')[0]]))
+        print(starPflag[np.where(starID == 's15542')[0]])
         starPflag[np.where(starID == 's17368')[0]] = -1
-        print((starPflag[np.where(starID == 's17368')[0]]))
+        print(starPflag[np.where(starID == 's17368')[0]])
         starPflag[np.where(starID == 's16768')[0]] = -1
-        print((starPflag[np.where(starID == 's16768')[0]]))
+        print(starPflag[np.where(starID == 's16768')[0]])
         starPflag[np.where(starID == 's11555')[0]] = -1
-        print((starPflag[np.where(starID == 's11555')[0]]))
-        starPflag[np.where(starID == 's13030')[0]] = -2
-        print((starPflag[np.where(starID == 's13030')[0]]))
+        print(starPflag[np.where(starID == 's11555')[0]])
 
     ###############################
     ## Define and fill final arrays
@@ -959,82 +664,22 @@ def input3(maskname, semester, maskPA, masknum):
     print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
-    if masknum == 30:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
+    if masknum == 80:
+        pflagcut = (((targetPcode == 10000) & (targetINFO != 1)) ^ ((targetPcode == 100) & (targetINFO != 1)) ^ ((targetPcode == 5000) & (targetINFO != 1)) ^ ((targetPcode == 50) & (targetINFO != 1))) ^ ((targetPcode == 1000) & (targetINFO != 1)) ^ ((targetPcode == 10) & (targetINFO != 1))
 
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 40:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    #elif masknum == 12:
-        #pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        #print(targetINFO[pflagcut])
-        #print(np.max(targetINFO[pflagcut]))
-        #print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 13:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ ((targetPcode == 100) & (targetINFO != 1)) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 14:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ ((targetPcode == 100)) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 15:
+    elif masknum == 33:
         pflagcut = (((((targetPcode == 10000)) | ((targetPcode == 5000)) | ((targetPcode == 100)) | ((targetPcode == 50)))) | (((targetPcode == 1000)| (targetPcode == 10) | (targetPcode == 5)) & (targetINFO != 1)) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5) & (targetINFO != 1)) | ((targetPcode == 1) & (targetMAG < 25.5) & (targetMAG > 18.) & (targetINFO != 1) & (((targetZ > 1.3) & (targetZ < 2.3)) | (targetZ < 0.5))))
 
         print((targetINFO[pflagcut]))
         print((np.max(targetINFO[pflagcut])))
         print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 23:
-        pflagcut = (((targetPcode >= 5) & (targetINFO != 1)) | ((targetPcode == 100)) | ((targetPcode == 50))) | ((targetPcode == 1) & (targetMAG < 25.5) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) | (targetZ < 0.3))) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5) & (targetINFO != 1))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 22:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 32:
-        pflagcut = ((targetPcode > 500) & (targetINFO != 1)) ^ (targetPcode == 100) ^ (targetPcode == 10) ^ (targetPcode == 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
-        print(targetINFO[pflagcut])
-        print(np.max(targetINFO[pflagcut]))
-        print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
-
-    elif masknum == 33:
-        pflagcut = (((targetPcode >= 5) & (targetINFO != 1)) | ((targetPcode == 100)) | ((targetPcode == 50)) | ((targetPcode == 1) & (targetMAG < 25.5) & (targetMAG > 18.) & (targetINFO != 1) & ((targetZ > 1.3) | (targetZ < 0.3))) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)  & (targetINFO != 1)))
-
-        print((targetINFO[pflagcut]))
-        print((np.max(targetINFO[pflagcut])))
-        print((len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])))
-
-    elif masknum == 70:
-        pflagcut = ((targetPcode == 10000) ^ (targetPcode == 5000) ^ (targetPcode == 1000))
         
     else:
-        pflagcut = (targetPcode >= 5) | ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
-
+        pflagcut = (targetPcode >= 5) ^ ((targetPcode == 1) & (targetZ < 1.3) & (targetZ > 0.3) & (targetMAG > 25.5)) ^ ((targetPcode == 1) & (targetMAG < 24.) & (targetMAG > 18.) & ((targetZ > 1.3) ^ (targetZ < 0.3)))
+        
+    print(targetINFO[pflagcut])
+    print(np.max(targetINFO[pflagcut]))
+    print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
 
     tID = targetID[pflagcut]
     tRA = targetRA[pflagcut]
@@ -1045,39 +690,17 @@ def input3(maskname, semester, maskPA, masknum):
     tPA = targetPA[pflagcut]
 
     objPA = np.empty(len(tPA),dtype = '<f8')
-    if masknum == 30:
+    if masknum == 31:
         objPA[:] = 40.0
-
-    elif masknum == 10:
+    elif masknum == 11:
         objPA[:] = -78.5
-
-    elif masknum == 12:
-        objPA[:] = -78.5
-
-    elif masknum == 13:
-        objPA[:] = -78.5
-
-    elif masknum == 14:
-        objPA[:] = maskPA-5.0
-
-    elif masknum == 20:
-        objPA[:] = 2.5
-
-    elif masknum == 22:
-        objPA[:] = maskPA+5.0
-
-    elif masknum == 32:
-        objPA[:] = maskPA-5.0
-
-    elif masknum == 33:
-        objPA[:] = maskPA-5.0
-        
-    elif masknum == 40:
-        objPA[:] = -3
+    elif masknum == 21:
+        objPA[:] = -7
     else:
-        objPA[:] = maskPA+5.0
-        #print('wrong PA...')
+        objPA[:] = maskPA + 5.0
+        #print('PA sucks...')
     
+
     finalID = np.append(finalID, tID)
     finalRA = np.append(finalRA, tRA)
     finalDEC = np.append(finalDEC, tDEC)
@@ -1182,14 +805,10 @@ def input3(maskname, semester, maskPA, masknum):
     finalSAM[:] = 1
     finalSEL = np.empty(len(finalID), dtype = int)
     finalSEL[:] = 0
-    print(mID)
-    print(finalID)
-    
 
     for i in range(len(mID)):
-        print(mID[i])
+
         cut = finalID == mID[i]
-        print(np.unique(cut))
         finalSEL[cut] = 1
 
     print(len(finalSEL[np.where(finalSEL == 1)[0]]))
@@ -1213,6 +832,6 @@ def input3(maskname, semester, maskPA, masknum):
 
     print('saving...')
 
-    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2018a': 'deimos mask'})
+    t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2017B': 'Keck/DEIMOS'})
 
-    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii',overwrite=True)
+    t.write(semester+'/maskdesign/'+maskname+'.input', format='ascii', overwrite=True)

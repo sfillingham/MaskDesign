@@ -1,5 +1,6 @@
 import numpy as np
 import astropy.io.fits as fits
+import astropy.io.ascii as ascii
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import astropy.coordinates as Coord
@@ -8,7 +9,7 @@ import astropy.coordinates as Coord
 ## Specify the threshold in degrees. This is the maximum distance that any two
 ## matched objects can lie in different catalog.
 ################################################################################
-def specmatch(threshold):
+def specmatch(instrument,semester,field,threshold='default'):
 
     if threshold == 'default':
 
@@ -19,38 +20,59 @@ def specmatch(threshold):
         limit = threshold
 
     #read in fits data for matching
-    deephdulist = fits.open('/Users/Sean/research/deep/zcat.alldeep.2015jul27.fits')
-    deepdata = deephdulist[1].data
-    nfhdulist = fits.open('/Users/Sean/research/newfirm_mbs/newfirm_mbs_catalog.fits')
-    nfdata = nfhdulist[1].data
+    if field == 'egs':
+        deephdulist = fits.open('/Users/spf/research/deep/zcat.alldeep.2015jul27.fits')
+        specdata = deephdulist[1].data
+        spec_ra = specdata['RA']
+        spec_dec = specdata['DEC']
+        spec_zspec = specdata['Z']
+        spec_ID = specdata['OBJNO']
+        zqual = specdata['ZQUALITY']
+        
+    elif field == 'cosmos':
+        specdata = ascii.read('/Users/spf/cosmos/cosmos_candels_public.dat')
+        spec_ra = specdata['RA']
+        spec_dec = specdata['DEC']
+        spec_zspec = specdata['z_spec']
+        zqual = specdata['z_quality']
+        zqual[np.where(zqual == 'A')[0]] = 4.0
+        zqual[np.where(zqual == 'C')[0]] = 1.0
+        
+    else:
+        print('choose a real field')
 
-    deep_ra = deepdata['RA']
-    deep_dec = deepdata['DEC']
-    deep_zspec = deepdata['Z']
-    deep_ID = deepdata['OBJNO']
-    zqual = deepdata['Z']
+    if field == 'cosmos':
+        nfhdulist = fits.open('/Users/spf/keck_obs/'+instrument+'/'+semester+'/COSMOS2015_catalog.fits')
+    else:
+        nfhdulist = fits.open('/Users/spf/keck_obs/'+instrument+'/'+semester+'/newfirm_mbs_catalog.fits')
+    nfdata = nfhdulist[1].data
     nf_ra = nfdata['ra']
     nf_dec = nfdata['dec']
-    nf_zspec = nfdata['deepz']
+    if field == 'egs':
+        nf_zspec = nfdata['deepz']
+    elif field == 'cosmos':
+        nf_zspec = nfdata['zcosmos']
+    else:
+        print('choose a real field')
     nf_id = nfdata['ID']
 
     deepID_out = np.empty(len(nf_ra))
     nmbsID = np.empty(len(nf_ra))
-    
 
-    deepcatalog = SkyCoord(ra=deep_ra*u.degree, dec = deep_dec*u.degree)
+    speccatalog = SkyCoord(ra=spec_ra*u.degree, dec = spec_dec*u.degree)
     nfcatalog = SkyCoord(ra=nf_ra*u.degree, dec = nf_dec*u.degree)
 
-    idx,d2d,d3d = nfcatalog.match_to_catalog_sky(deepcatalog)
+    idx,d2d,d3d = nfcatalog.match_to_catalog_sky(speccatalog)
 
     d2d = d2d/u.degree
 
     #use the threshold to determine matching objects and insert specz accordingly
     for i in range(len(idx)):
         location = idx[i]
-        testgood = (d2d[i] < limit) and (zqual[location] > 2.8)
-        testbad = (d2d[i] < limit) and (zqual[location] < 2.8) and (zqual[location] > 0)
-        teststar = (d2d[i] < limit) and (zqual[location] == -1)
+        zq = zqual[location].astype(np.float)
+        testgood = (d2d[i] < limit) and (zq > 2.8)
+        testbad = (d2d[i] < limit) and (zq < 2.8) and (zq > 0)
+        teststar = (d2d[i] < limit) and (zq == -1)
         #print test
         
 
@@ -71,7 +93,10 @@ def specmatch(threshold):
             #deepID_out[i] = -99
             #nmbsID[i] = nf_id[location]
 
-    nfhdulist.writeto('newfirm_mbs_deepz_catalog_IDcheck.fits')
+    if field == 'cosmos':
+        nfhdulist.writeto(semester+'/COSMOS2015_specz_catalog.fits')
+    else:
+        nfhdulist.writeto(semester+'/newfirm_mbs_specz_catalog.fits')
 
     #return deepID_out, nmbsID
 
@@ -81,7 +106,7 @@ def specmatch(threshold):
 ################################################################################################
 
 def doops(input_ra,input_dec):
-    print len(input_ra)
+    print(len(input_ra))
 
     c = SkyCoord(ra=input_ra*u.degree,dec=input_dec*u.degree)
     h_ra = c.ra.hms[0]
@@ -93,19 +118,19 @@ def doops(input_ra,input_dec):
 
     ra_check1 = np.round(s_ra,decimals=2)
     RAvalue1, RAindex1 = np.unique(ra_check1, return_index=True)
-    print RAvalue1
-    print RAindex1
+    #print RAvalue1
+    #print RAindex1
     dec_check1 = np.round(s_dec[RAindex1], decimals=1)
     DECvalue1, DECindex1 = np.unique(dec_check1, return_index=True)
-    print len(DECvalue1)
+    #print len(DECvalue1)
 
 
     dec_check2 = np.round(s_dec, decimals=1)
     DECvalue2, DECindex2 = np.unique(dec_check, return_index=True)
-    print len(DECvalue2)
+    #print len(DECvalue2)
     ra_check2 = np.round(s_ra[DECindex2],decimals=2)
     RAvalue2, RAindex2 = np.unique(ra_check2, return_index=True)
-    print len(RAvalue2)
+    #print len(RAvalue2)
 
     combineindex = np.append(DECindex1,RAindex2)
 
@@ -163,12 +188,21 @@ def doops(input_ra,input_dec):
 ## Add the SDSS objects to the master catalog, BLAH...I should add more of a description
 ################################################################################################
 
-def sdss_match():
+def sdss_match(instrument, semester, field):
 
-    nfhdulist = fits.open('/Users/Sean/research/newfirm_mbs/newfirm_mbs_deepz_catalog.fits')
-    sdsshdulist = fits.open('/Users/Sean/research/sdss/egs/NMBS_DR7_sfillingham.fit')
+    
+    if field == 'egs':
+        sdsshdulist = fits.open('/Users/spf/research/sdss/egs/NMBS_DR7_sfillingham.fit')
+        nfhdulist = fits.open('/Users/spf/keck_obs/'+instrument+'/'+semester+'/newfirm_mbs_specz_catalog.fits')
+        
+    elif field == 'cosmos':
+        sdsshdulist = fits.open('/Users/spf/research/sdss/cosmos/COSMOS_r22_sfillingham.fit')
+        nfhdulist = fits.open('/Users/spf/keck_obs/'+instrument+'/'+semester+'/COSMOS2015_specz_catalog.fits')
+        
+    else:
+        print('choose a real field')
+        
     sdssdata = sdsshdulist[1].data
-
     Rtest = sdssdata['r']
     star_flagtest = sdssdata['type_r']
     mode = sdssdata['mode']
@@ -317,6 +351,9 @@ def sdss_match():
 
     nfhdulist.append(tbhdu)
 
-    nfhdulist.writeto('newfirm_mbs_deepz_sdss_catalog.fits')
+    if field == 'cosmos':
+        nfhdulist.writeto(semester+'/COSMOS2015_specz_sdss_catalog.fits')
+    else:
+        nfhdulist.writeto(semester+'/newfirm_mbs_specz_sdss_catalog.fits')
 
     

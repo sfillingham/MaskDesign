@@ -73,13 +73,13 @@ def input1(maskname, maskPA, passnum, inputnum):
     ##################################
     ## Begin with the target selection
     ##################################
-    print 'target selection...'
+    print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
     pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) ^ ((targetPcode == 100) & (targetINFO != 1)) ^ ((targetPcode == 1000) & (targetINFO != 1)) ^ ((targetPcode == 10) & (targetINFO != 1))
-    print targetINFO[pflagcut]
-    print np.max(targetINFO[pflagcut])
-    print len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])
+    print(targetINFO[pflagcut])
+    print(np.max(targetINFO[pflagcut]))
+    print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
 
     tID = targetID[pflagcut]
     tRA = targetRA[pflagcut]
@@ -119,14 +119,14 @@ def input1(maskname, maskPA, passnum, inputnum):
     finalPcode = np.append(finalPcode, tPcode)
     finalPA = np.append(finalPA, objPA)
 
-    print 'done with targets'
+    print('done with targets')
 
     
     ##################################################
     ## Move to guide and alignment star selection
     ##################################################
 
-    print 'alignment stars'
+    print('alignment stars')
 
     aligncut = starPflag == -2
     alignID = starID[aligncut]
@@ -144,7 +144,7 @@ def input1(maskname, maskPA, passnum, inputnum):
     finalPcode = np.append(finalPcode,alignPcode)
     finalPA = np.append(finalPA,alignPA)
 
-    print 'guide stars...'
+    print('guide stars...')
 
     guidecut = starPflag == -1
     guideID = starID[guidecut]
@@ -165,13 +165,13 @@ def input1(maskname, maskPA, passnum, inputnum):
     finalPA = np.append(finalPA,guidePA)
     finalPA = np.round(finalPA,decimals=2)
 
-    print 'done with stars'
+    print('done with stars')
 
     ##############################################################
     ## Change the RA and DEC format to match DSIM requirements
     ##############################################################
 
-    print 'changing coords...'
+    print('changing coords...')
 
     c = SkyCoord(finalRA*u.degree, finalDEC*u.degree)
     outputRA = np.chararray(len(finalID),itemsize = 20)
@@ -203,7 +203,7 @@ def input1(maskname, maskPA, passnum, inputnum):
             else:
                 outputDEC[i] = '-'+np.str(np.int(d_dec[i]))+':'+np.str(np.int(m_dec[i]))+':'+np.str(np.round(s_dec[i],decimals=2))
 
-    print 'done'
+    print('done')
 
     ##############################################################
     ## Add the extra columns which are the same for every object
@@ -217,23 +217,23 @@ def input1(maskname, maskPA, passnum, inputnum):
     finalSEL = np.empty(len(finalID), dtype = int)
     finalSEL[:] = 0
 
-    print len(finalID)
-    print len(finalRA)
-    print len(finalDEC)
-    print len(finalEQ)
-    print len(finalMAG)
-    print len(finalPBand)
-    print len(finalPcode)
-    print len(finalSAM)
-    print len(finalSEL)
-    print len(finalPA)
+    print(len(finalID))
+    print(len(finalRA))
+    print(len(finalDEC))
+    print(len(finalEQ))
+    print(len(finalMAG))
+    print(len(finalPBand))
+    print(len(finalPcode))
+    print(len(finalSAM))
+    print(len(finalSEL))
+    print(len(finalPA))
     
 
     ##############################################################
     ## Combine all the columns into one table and save output
     ##############################################################
 
-    print 'saving...'
+    print('saving...')
 
     t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2016a': 'deimos mask'})
 
@@ -258,7 +258,7 @@ def input2(maskname, maskPA, passnum, inputnum):
     elif inputnum == 2:
         hdum = fits.open('maskdesign/mask4a.fits')
     else:
-        print 'wrong...try again!'
+        print('wrong...try again!')
 
     mdata = hdum[1].data
     mID = mdata['OBJECT']
@@ -310,13 +310,13 @@ def input2(maskname, maskPA, passnum, inputnum):
     ##################################
     ## Begin with the target selection
     ##################################
-    print 'target selection...'
+    print('target selection...')
 
     #choose this for each pass, depending on what must be on the mask
     pflagcut = ((targetPcode == 10000) & (targetINFO != 1)) ^ (targetPcode == 100) ^ ((targetPcode == 1000) & (targetINFO != 1)) ^ (targetPcode == 10)
-    print targetINFO[pflagcut]
-    print np.max(targetINFO[pflagcut])
-    print len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]])
+    print(targetINFO[pflagcut])
+    print(np.max(targetINFO[pflagcut]))
+    print(len(targetINFO[pflagcut][np.where(targetINFO[pflagcut]==1)[0]]))
 
     tID = targetID[pflagcut]
     tRA = targetRA[pflagcut]
@@ -356,14 +356,14 @@ def input2(maskname, maskPA, passnum, inputnum):
     finalPcode = np.append(finalPcode, tPcode)
     finalPA = np.append(finalPA, objPA)
 
-    print 'done with targets'
+    print('done with targets')
 
     
     ##################################################
     ## Move to guide and alignment star selection
     ##################################################
 
-    print 'alignment stars'
+    print('alignment stars')
 
     aligncut = starPflag == -2
     alignID = starID[aligncut]
@@ -381,7 +381,7 @@ def input2(maskname, maskPA, passnum, inputnum):
     finalPcode = np.append(finalPcode,alignPcode)
     finalPA = np.append(finalPA,alignPA)
 
-    print 'guide stars...'
+    print('guide stars...')
 
     guidecut = starPflag == -1
     guideID = starID[guidecut]
@@ -402,13 +402,13 @@ def input2(maskname, maskPA, passnum, inputnum):
     finalPA = np.append(finalPA,guidePA)
     finalPA = np.round(finalPA,decimals=2)
 
-    print 'done with stars'
+    print('done with stars')
 
     ##############################################################
     ## Change the RA and DEC format to match DSIM requirements
     ##############################################################
 
-    print 'changing coords...'
+    print('changing coords...')
 
     c = SkyCoord(finalRA*u.degree, finalDEC*u.degree)
     outputRA = np.chararray(len(finalID),itemsize = 20)
@@ -440,7 +440,7 @@ def input2(maskname, maskPA, passnum, inputnum):
             else:
                 outputDEC[i] = '-'+np.str(np.int(d_dec[i]))+':'+np.str(np.int(m_dec[i]))+':'+np.str(np.round(s_dec[i],decimals=2))
 
-    print 'done'
+    print('done')
 
     ##############################################################
     ## Add the extra columns which are the same for every object
@@ -459,23 +459,23 @@ def input2(maskname, maskPA, passnum, inputnum):
         cut = finalID == mID[i]
         finalSEL[cut] = 1
 
-    print len(finalID)
-    print len(finalRA)
-    print len(finalDEC)
-    print len(finalEQ)
-    print len(finalMAG)
-    print len(finalPBand)
-    print len(finalPcode)
-    print len(finalSAM)
-    print len(finalSEL)
-    print len(finalPA)
+    print(len(finalID))
+    print(len(finalRA))
+    print(len(finalDEC))
+    print(len(finalEQ))
+    print(len(finalMAG))
+    print(len(finalPBand))
+    print(len(finalPcode))
+    print(len(finalSAM))
+    print(len(finalSEL))
+    print(len(finalPA))
     
 
     ##############################################################
     ## Combine all the columns into one table and save output
     ##############################################################
 
-    print 'saving...'
+    print('saving...')
 
     t = Table([finalID,outputRA,outputDEC,finalEQ,finalMAG,finalPBand,finalPcode,finalSAM,finalSEL,finalPA], names=('ID', 'RA', 'DEC','Equinox','Magnitude','PassBand','Pcode','Sample','Select','SlitPA'), meta={'2016a': 'deimos mask'})
 
