@@ -1,6 +1,7 @@
 # MaskDesign
 Useful scripts for multi object spectroscopy mask design and general
-spectroscopic observation planning
+spectroscopic observation planning.
+Specifically, these scripts were used to design Keck/DEIMOS slitmasks via the dsimulator package.
 
 ## Keck/DEIMOS
 - determine priority.py
