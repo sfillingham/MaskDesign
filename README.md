@@ -1,4 +1,4 @@
-# MaskDesign
+# mask-design
 Useful scripts for multi object spectroscopy mask design and general
 spectroscopic observation planning.
 Specifically, these scripts were used to design Keck/DEIMOS slitmasks via the dsimulator package.
